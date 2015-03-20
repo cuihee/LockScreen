@@ -358,10 +358,13 @@ public class Setting extends Activity
                 break;
             case R.id.ok:
                 Log.d("Setting","tmp_password : "+tmp_password);
+                //第0次输入完，记录键值
                 if (count==0)
                     password=tmp_password;
+                //用于第1、2、3、4次输入对比键值
                 if (tmp_password.equals(password)){
                     text.setText("请再次输入");
+                    //记录 持续时间 压力 面积
                     Log.d("Setting","tmp_hold_time : "+tmp_hold_time.toString());
                     hold_time.add(tmp_hold_time);
                     Log.d("Setting","tmp_pressure : "+tmp_pressure.toString());
@@ -372,19 +375,20 @@ public class Setting extends Activity
                 }else{
                     text.setText("输入错误");
                 }
+                //准备下次输入
                 hint="";
                 tmp_password="";
                 tmp_hold_time=new Vector<Long>();
                 tmp_pressure=new Vector<Vector<Float>>();
                 tmp_size=new Vector<Vector<Float>>();
-
+                //输入完五遍
                 if (count==5){
                     try {
                         Log.d("Password",password);
                         Log.d("Holding Time",hold_time.toString());
                         Log.d("Pressure",pressure.toString());
                         Log.d("Size",size.toString());
-
+                        //由vec组成的vecs是输入特征大数组
                         Vector<Vector<Float>> vecs=new Vector<Vector<Float>>();
                         for (int i=0;i<count;i++){
                             Vector<Float> vec=new Vector<Float>();
@@ -420,18 +424,21 @@ public class Setting extends Activity
                             dev-=count*mean*mean;
                             dev/=(float)(count-1);
                             dev=Math.sqrt(dev);
-                            upLimit.add((float)(mean+dev*t/sqrt_n));
+                            upLimit.add((float)   (mean + dev * t / sqrt_n));
                             downLimit.add((float) (mean - dev * t / sqrt_n));
                         }
+                        //上下限都是五个
                         Log.d("upLimit",upLimit.toString());
                         Log.d("downLimit",downLimit.toString());
 
                         byte[] bytes=password.getBytes("UTF-8");
                         MessageDigest md=MessageDigest.getInstance("MD5");
+                        //将utf-8的密码赋到申请的md
                         bytes=md.digest(bytes);
+                        //密码以MD5保存在password
                         password=new String(bytes);
                         Log.d("MD5",password);
-
+                        //写“password”文件 密码和上下限
                         FileOutputStream fileOutputStream = openFileOutput("password",MODE_PRIVATE);
                         ObjectOutputStream objectOutputStream=new ObjectOutputStream(fileOutputStream);
 
